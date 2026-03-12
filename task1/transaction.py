@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from enum import Enum
-# import json
+from enum import StrEnum, unique, auto
 
-class user_account:
+class UserAccount:
     def __init__(self, username, user_id):
         self.__username = username
         self.__user_id = user_id
@@ -14,7 +13,37 @@ class user_account:
     def get_user_id(self):
         return self.__user_id
 
-class transaction(ABC):
+@unique
+class TransactionType(StrEnum):
+    EXPENSE = auto()
+    DEPOSIT = auto()
+
+@unique
+class ExpenseType(StrEnum):
+    # auto() is not used to ensure proper
+    # interaction with sqlite
+    FOOD = 'food'
+    TRANSPORT = 'transport'
+    RENT = 'rent'
+    BILLS = 'bills'
+    INVESTMENT = 'investment'
+    OTHERS = 'others'
+
+@unique
+class TransactionMethod(StrEnum):
+    WIRE = auto()
+    CASH = auto()
+    ALIPAY = auto()
+    APPLE_PAY = auto()
+    CREDIT_CARD = auto()
+    OTHERS = auto()
+
+@unique
+class CurrencyType(StrEnum):
+    HKD = auto()
+    USD = auto()
+
+class Transaction(ABC):
     @staticmethod
     def get_current_date():
         return datetime.now().date()
@@ -29,7 +58,6 @@ class transaction(ABC):
                                   expense_type,
                                   transferor):
 
-        # TODO: write the transaction history to a json file
         if history_type == self.transaction_type.EXPENSE:
             pass
         elif history_type == self.transaction_type.DEPOSIT:
@@ -42,37 +70,13 @@ class transaction(ABC):
     def print_current_log():
         pass
 
-    class transaction_type(Enum):
-        EXPENSE = 1
-        DEPOSIT = 2
-
-    class expense_type(Enum):
-        FOOD = 1
-        TRANSPORT = 2
-        RENT = 3
-        BILLS = 4
-        INVESTMENT = 5
-        OTHERS = 6
-
-    class transaction_method(Enum):
-        WIRE = 1
-        CASH = 2
-        ALIPAY = 3
-        APPLE_PAY = 4
-        CREDIT_CARD = 5
-        OTHERS = 6
-
-    class currency(Enum):
-        HKD = 1
-        USD = 2
-
-class expense(transaction):
+class Expense(Transaction):
     def __init__(self,
-                 account: user_account,
-                 transaction_method: transaction.transaction_method,
+                 account: UserAccount,
+                 transaction_method: TransactionMethod,
                  amount: float,
-                 currency: transaction.currency,
-                 expense_type: transaction.expense_type):
+                 currency: CurrencyType,
+                 expense_type: ExpenseType):
 
         self.time = super().get_current_date()
         self.__account = account
@@ -82,16 +86,16 @@ class expense(transaction):
         self.expense_type = expense_type
 
     def print_current_log(self):
-        print(f'[{self.time}] | {self.__account.get_username()}: -{self.amount}{self.currency.name} | ({self.expense_type.name}, {self.transaction_method.name})')
+        print(f'[{self.time}] | {self.__account.get_username()}: -{self.amount}{self.currency} | ({self.expense_type}, {self.transaction_method})')
         return
 
-class deposit(transaction):
+class Deposit(Transaction):
     def __init__(self,
-                 account: user_account,
-                 transaction_method: transaction.transaction_method,
+                 account: UserAccount,
+                 transaction_method: TransactionMethod,
                  amount: float,
-                 currency: transaction.currency,
-                 transferor: user_account):
+                 currency: CurrencyType,
+                 transferor: UserAccount):
 
         self.time = super().get_current_date()
         self.__account = account
@@ -101,23 +105,15 @@ class deposit(transaction):
         self.__transferor = transferor
 
     def print_current_log(self):
-        print(f'[{self.time}] | {self.__account.get_username()} -> {self.__transferor.get_username()}: {self.amount}{self.currency.name} | ({self.transaction_method.name})')
+        print(f'[{self.time}] | {self.__account.get_username()} -> {self.__transferor.get_username()}: {self.amount}{self.currency} | ({self.transaction_method})')
         return
 
 if __name__ == '__main__':
-    user1 = user_account('Alice', 1)
-    user2 = user_account('Bob', 2)
+    user1 = UserAccount('Alice', 1)
+    user2 = UserAccount('Bob', 2)
 
-    e = expense(user1,
-                transaction.transaction_method.APPLE_PAY,
-                100,
-                transaction.currency.HKD,
-                transaction.expense_type.FOOD)
+    e = Expense(user1, TransactionMethod.APPLE_PAY, 100, CurrencyType.HKD, ExpenseType.FOOD)
     e.print_current_log()
 
-    d = deposit(user1,
-                transaction.transaction_method.CASH,
-                1000,
-                transaction.currency.USD,
-                user2)
+    d = Deposit(user1, TransactionMethod.CASH, 1000, CurrencyType.USD, user2)
     d.print_current_log()

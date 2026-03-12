@@ -1,0 +1,14 @@
+DROP TABLE IF EXISTS catagories;
+DROP TABLE IF EXISTS transactions;
+
+CREATE TABLE catagories (
+    id INTEGER PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    amount REAL NOT NULL,
+    date TEXT DEFAULT CURRENT_TIMESTAMP,
+    catagory_id INTEGER REFERENCES catagories(id)
+);
