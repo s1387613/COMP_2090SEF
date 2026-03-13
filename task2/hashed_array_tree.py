@@ -35,6 +35,25 @@ class hashed_array_tree:
         self.directory[directory_index][leaf_index] = value
         self.count += 1
 
+    def pop(self, index):
+        if index >= self.count or index < 0:
+            raise IndexError('HAT: index out of range')
+
+        directory_index, leaf_index = self.__lookup_index(index, self.power, self.size - 1)
+        if self.directory[directory_index][leaf_index] is None:
+            raise ValueError('HAT: there is no value at the requested index')
+        else:
+            return_value = self.directory[directory_index][leaf_index]
+
+        self.directory[directory_index][leaf_index] = None
+        while index < self.count:
+            old_dir, old_leaf = self.__lookup_index(index, self.power, self.size - 1)
+            index += 1
+            value_dir, value_leaf = self.__lookup_index(index, self.power, self.size - 1)
+            self.directory[old_dir][old_leaf] = self.directory[value_dir][value_leaf]
+
+        return return_value
+
     def get_value(self, index):
         if index >= self.count or index < 0:
             raise IndexError('HAT: index out of range')
@@ -64,5 +83,8 @@ if __name__ == '__main__':
 
     # expected output: 5
     print(arr.get_value(5))
-
-    print(*arr.flatten())
+    print(arr.flatten())
+    # expected output: 5
+    print(arr.pop(5))
+    # no empty placeholder for value at index 5
+    print(arr.flatten())
