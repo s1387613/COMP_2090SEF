@@ -9,7 +9,12 @@ class DBHelper:
             'get_catagory_id': 'SELECT id FROM catagories WHERE (name) = (?)',
             'get_method_id'  : 'SELECT id FROM methods WHERE (name) = (?)',
             'add_transaction': 'INSERT INTO transactions (amount, catagory_id, method_id, description) VALUES (?, ?, ?, ?)',
-            'get_balance'    : 'SELECT SUM(amount) FROM transactions'
+            'get_balance'    : 'SELECT SUM(amount) FROM transactions',
+            'get_history'    : """SELECT t.amount, t.date, c.name, m.name, t.description
+                                  FROM transactions t
+                                  JOIN catagories c ON t.catagory_id = c.id
+                                  JOIN methods m ON t.method_id = m.id
+                                  ORDER BY t.id DESC"""
         }
         self.db_name = db_name
         self.db_schema = db_schema
