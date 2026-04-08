@@ -9,7 +9,7 @@ CREATE TABLE methods (
 
 CREATE TABLE catagories (
     id INTEGER PRIMARY KEY,
-    name TEXT CHECK(name IN ('food', 'transport', 'rent', 'bills', 'investment', 'others', 'non_expense'))
+    name TEXT CHECK(name IN ('food', 'transport', 'rent', 'bills', 'tax', 'investment', 'others', 'non_expense'))
 );
 
 CREATE TABLE transactions (

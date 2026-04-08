@@ -11,6 +11,7 @@ class ExpenseType(StrEnum):
     TRANSPORT   = 'transport'
     RENT        = 'rent'
     BILLS       = 'bills'
+    TAX         = 'tax'
     INVESTMENT  = 'investment'
     OTHERS      = 'others'
     NON_EXPENSE = 'non_expense'
