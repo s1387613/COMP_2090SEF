@@ -31,13 +31,20 @@ class FinanceManager(tk.Tk):
         frame.tkraise()
         if page_name == 'HistoryPage':
             frame.populate_list()
+        elif page_name =='IndexPage':
+            frame.load_balance()
 
 class IndexPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
+        with DBHelper() as db:
+            self.balance = db.get_balance()
+
         label = tk.Label(self, text='Click a button to get started', font=('Arial', 14))
-        label.pack(pady=20)
+        label.pack(pady=10)
+        self.balance_label = tk.Label(self, text=f'Current Balance: {self.balance}', font=('Arial', 14))
+        self.balance_label.pack(pady=10)
 
         expense_button = tk.Button(self, text='Expense',
                                    command=lambda: controller.show_frame('ExpensePage'))
@@ -45,9 +52,16 @@ class IndexPage(tk.Frame):
                                    command=lambda: controller.show_frame('DepositPage'))
         history_button = tk.Button(self, text='History',
                                    command=lambda: controller.show_frame('HistoryPage'))
-        expense_button.pack(pady=20)
-        deposit_button.pack(pady=20)
-        history_button.pack()
+        expense_button.pack(pady=10)
+        deposit_button.pack(pady=10)
+        history_button.pack(pady=20)
+
+    def load_balance(self):
+        with DBHelper() as db:
+            self.balance = db.get_balance()
+        self.balance_label.destroy()
+        self.balance_label = tk.Label(self, text=f'Current Balance: {self.balance}', font=('Arial', 14))
+        self.balance_label.pack(pady=10)
 
 class ExpensePage(tk.Frame):
     def __init__(self, parent, controller):
