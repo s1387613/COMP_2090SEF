@@ -29,6 +29,8 @@ class FinanceManager(tk.Tk):
     def show_frame(self, page_name):
         frame = self.frames[page_name]
         frame.tkraise()
+        if page_name == 'HistoryPage':
+            frame.populate_list()
 
 class IndexPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -163,12 +165,7 @@ class HistoryPage(tk.Frame):
                                   font=('Courier', 12))
         self.scrollbar.config(command=self.listbox.yview)
 
-        # populate the history
-        with DBHelper() as db:
-            self.history = db.cursor.execute(db.query['get_history']).fetchall()
-            for item in self.history:
-                date = datetime.strptime(item[1], '%Y-%m-%d %H:%M:%S').date()
-                self.listbox.insert(tk.END, f'$ {item[0]:<15} | {str(date):>5}')
+        self.populate_list()
         self.listbox.grid(row=0, column=0, sticky='nsew')
         self.listbox.bind('<<ListboxSelect>>',
                           self.__on_select)
@@ -178,6 +175,15 @@ class HistoryPage(tk.Frame):
                                      font=('Arial', 14),
                                      command=self.__back_to_index)
         self.back_button.grid(row=1, column=0, stick='nsew')
+
+    def populate_list(self):
+        # populate the history
+        with DBHelper() as db:
+            self.listbox.delete(0, tk.END)
+            self.history = db.cursor.execute(db.query['get_history']).fetchall()
+            for item in self.history:
+                date = datetime.strptime(item[1], '%Y-%m-%d %H:%M:%S').date()
+                self.listbox.insert(tk.END, f'$ {item[0]:<15} | {str(date):>5}')
 
     def __on_select(self, event):
         selection = event.widget.curselection()
