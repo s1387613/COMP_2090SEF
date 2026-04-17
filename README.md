@@ -20,6 +20,9 @@ python3 interface.py
 ### Tests
 For simple test cases, you can run the Python files itself.
 
+### Demo
+https://github.com/s1387613/COMP_2090SEF/blob/main/task1/task1_demo.mp4
+
 ## Task 2
 Data structure: hashed array tree
 
